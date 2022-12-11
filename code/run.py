@@ -195,10 +195,6 @@ def train(args, train_dataset, model, tokenizer):
             labels=batch[1].to(args.device) 
             model.train()
             loss,logits = model(inputs, labels)
-            # print(logits.shape)
-            # print(labels.shape)
-            # print(logits)
-
 
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training
