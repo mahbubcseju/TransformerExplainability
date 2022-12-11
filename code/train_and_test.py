@@ -109,7 +109,7 @@ class TextDataset(Dataset):
     def __getitem__(self, i):
         labels = np.zeros((2,))
         labels[self.examples[i].label] = 1
-        return torch.tensor(self.examples[i].input_ids), torch.tensor(labels)
+        return torch.tensor(self.examples[i].input_ids), torch.tensor(self.examples[i].label)
             
 
 def set_seed(seed=42):
@@ -299,7 +299,8 @@ def evaluate(args, model, tokenizer,eval_when_training=False):
     # print(labels.shape)
     # print("Evaluation: logits ", logits)
     # print("Evaluattion: labels ", labels)
-    acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
+    # acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
+    acts = labels
     preds = np.array([0 if (sample[0] > sample[1]) else 1 for sample in logits])
     # print("Evaluation: logits ", acts)
     # print("Evaluattion: labels ", preds)
@@ -347,7 +348,8 @@ def test(args, model, tokenizer):
     logits=np.concatenate(logits,0)
     labels=np.concatenate(labels,0)
 
-    acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
+    # acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
+    acts = labels
     preds = np.array([0 if (sample[0] > sample[1]) else 1 for sample in logits])
     with open(os.path.join(args.output_dir,"predictions.txt"),'w') as f:
         for example, pred in zip(eval_dataset.examples,preds):
@@ -482,8 +484,8 @@ class Args:
         self.model_type = "roberta"
         self.tokenizer_name="microsoft/codebert-base"
         self.model_name_or_path = "microsoft/codebert-base"
-        self.do_train = False
-        self.do_eval = False
+        self.do_train = True
+        self.do_eval = True
         self.do_test = True
         self.block_size=400
         self.train_batch_size=128
@@ -492,7 +494,7 @@ class Args:
         self.evaluate_during_training = True
         self.gnn="ReGCN"
         self.learning_rate=1e-4
-        self.epoch=5
+        self.epoch=1
         self.hidden_size=256
         self.num_GNN_layers=2
         self.format="uni"

@@ -170,10 +170,8 @@ class CodebertModel:
         preds = np.array([0 if (sample[0] > sample[1]) else 1 for sample in logits])
         eval_acc=np.mean(acts==preds)
         print("Accuracy: ", eval_acc)
-
     
     def create_explanations(self, args):
-
         eval_dataset = TextDataset(self.tokenizer, args, args.test_data_file)
         eval_sampler = SequentialSampler(eval_dataset) if args.local_rank == -1 else DistributedSampler(eval_dataset)
         eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
