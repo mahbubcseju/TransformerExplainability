@@ -1,0 +1,11 @@
+12/11/2022 00:17:35 - WARNING - __main__ -   Process rank: -1, device: cuda, n_gpu: 1, distributed training: False, 16-bits training: False
+Some weights of the model checkpoint at microsoft/codebert-base were not used when initializing RobertaForSequenceClassification: ['pooler.dense.bias', 'pooler.dense.weight']
+- This IS expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaForSequenceClassification were not initialized from the model checkpoint at microsoft/codebert-base and are newly initialized: ['classifier.dense.weight', 'classifier.dense.bias', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+12/11/2022 00:17:40 - INFO - __main__ -   Training/evaluation parameters <__main__.Args object at 0x14997cd4a410>
+12/11/2022 00:17:46 - INFO - __main__ -   ***** Running Test *****
+12/11/2022 00:17:46 - INFO - __main__ -     Num examples = 1724
+12/11/2022 00:17:46 - INFO - __main__ -     Batch size = 128
+  0%|          | 0/14 [00:00<?, ?it/s]  7%|▋         | 1/14 [00:01<00:15,  1.21s/it] 14%|█▍        | 2/14 [00:01<00:10,  1.15it/s] 21%|██▏       | 3/14 [00:02<00:08,  1.32it/s] 29%|██▊       | 4/14 [00:03<00:07,  1.41it/s] 36%|███▌      | 5/14 [00:03<00:06,  1.47it/s] 43%|████▎     | 6/14 [00:04<00:05,  1.51it/s] 50%|█████     | 7/14 [00:04<00:04,  1.53it/s] 57%|█████▋    | 8/14 [00:05<00:03,  1.55it/s] 64%|██████▍   | 9/14 [00:06<00:03,  1.56it/s] 71%|███████▏  | 10/14 [00:06<00:02,  1.57it/s] 79%|███████▊  | 11/14 [00:07<00:01,  1.58it/s] 86%|████████▌ | 12/14 [00:08<00:01,  1.58it/s] 93%|█████████▎| 13/14 [00:08<00:00,  1.58it/s]100%|██████████| 14/14 [00:09<00:00,  1.88it/s]100%|██████████| 14/14 [00:09<00:00,  1.55it/s]

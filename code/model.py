@@ -16,15 +16,15 @@ class Model(nn.Module):
         self.config=config
         self.tokenizer=tokenizer
         self.args=args
-        self.softmax = torch.softmax(dim=-1)
+        # self.softmax = torch.softmax(dim=-1)
         self.criterion = nn.CrossEntropyLoss()
     
         
     def forward(self, input_ids=None,labels=None): 
         outputs=self.encoder(input_ids, attention_mask=input_ids.ne(1))
         logits=outputs[0]
-        prob=self.softmax(logits)
+        prob=torch.softmax(logits, dim=-1)
         if labels is not None:
-            return self.criterion(prob, labels),prob
+            return self.criterion(prob, labels), prob
         else:
             return prob

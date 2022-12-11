@@ -86,7 +86,7 @@ def convert_examples_to_features(js,tokenizer,args):
     source_ids =  tokenizer.convert_tokens_to_ids(source_tokens)
     padding_length = args.block_size - len(source_ids)
     source_ids+=[tokenizer.pad_token_id]*padding_length
-    return InputFeatures(source_tokens,source_ids,js['idx'],js['target'])
+    return InputFeatures(source_tokens,source_ids,js[args.idx_key],js['target'])
 
 class TextDataset(Dataset):
     def __init__(self, tokenizer, args, file_path=None):
@@ -106,8 +106,10 @@ class TextDataset(Dataset):
     def __len__(self):
         return len(self.examples)
 
-    def __getitem__(self, i):       
-        return torch.tensor(self.examples[i].input_ids),torch.tensor(np.zeros(2)[self.examples[i].label])
+    def __getitem__(self, i):
+        labels = np.zeros((2,))
+        labels[self.examples[i].label] = 1
+        return torch.tensor(self.examples[i].input_ids), torch.tensor(labels)
             
 
 def set_seed(seed=42):
@@ -192,7 +194,10 @@ def train(args, train_dataset, model, tokenizer):
             inputs = batch[0].to(args.device)        
             labels=batch[1].to(args.device) 
             model.train()
-            loss,logits = model(inputs,labels)
+            loss,logits = model(inputs, labels)
+            # print(logits.shape)
+            # print(labels.shape)
+            # print(logits)
 
 
             if args.n_gpu > 1:
@@ -294,8 +299,14 @@ def evaluate(args, model, tokenizer,eval_when_training=False):
     labels=np.concatenate(labels,0)
     # preds=logits[:,0]>0.5
 
-    acts = [0 if sample[0] > sample[1] else 1 for sample in labels]
-    preds = [0 if sample[0] > sample[1] else 1 for sample in logits]
+    # print(logits.shape)
+    # print(labels.shape)
+    # print("Evaluation: logits ", logits)
+    # print("Evaluattion: labels ", labels)
+    acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
+    preds = np.array([0 if (sample[0] > sample[1]) else 1 for sample in logits])
+    # print("Evaluation: logits ", acts)
+    # print("Evaluattion: labels ", preds)
     eval_acc=np.mean(acts==preds)
     eval_loss = eval_loss / nb_eval_steps
     perplexity = torch.tensor(eval_loss)
@@ -339,9 +350,11 @@ def test(args, model, tokenizer):
 
     logits=np.concatenate(logits,0)
     labels=np.concatenate(labels,0)
-    preds=logits[:,0]>0.5
+
+    acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
+    preds = np.array([0 if (sample[0] > sample[1]) else 1 for sample in logits])
     with open(os.path.join(args.output_dir,"predictions.txt"),'w') as f:
-        for example,pred in zip(eval_dataset.examples,preds):
+        for example, pred in zip(eval_dataset.examples,preds):
             if pred:
                 f.write(example.idx+'\t1\n')
             else:
@@ -473,8 +486,8 @@ class Args:
         self.model_type = "roberta"
         self.tokenizer_name="microsoft/codebert-base"
         self.model_name_or_path = "microsoft/codebert-base"
-        self.do_train = True
-        self.do_eval = True
+        self.do_train = False
+        self.do_eval = False
         self.do_test = True
         self.block_size=400
         self.train_batch_size=128
@@ -483,7 +496,7 @@ class Args:
         self.evaluate_during_training = True
         self.gnn="ReGCN"
         self.learning_rate=1e-4
-        self.epoch=10
+        self.epoch=5
         self.hidden_size=256
         self.num_GNN_layers=2
         self.format="uni"
@@ -520,18 +533,18 @@ class Args:
         self.training_percent=1.0
         self.alpha_weight=1.0
 
-BASE_DIR = '/work/LAS/weile-lab/mdrahman/SliceLevelVulnerabilityDetection/'
-SAVED_DIR = '/work/LAS/weile-lab/mdrahman/SliceLevelVulnerabilityDetection/saved_models'
+BASE_DIR = '/work/LAS/weile-lab/mdrahman/TransformerExplainability/'
+SAVED_DIR = '/work/LAS/weile-lab/mdrahman/TransformerExplainability/saved_models'
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, required=True, help='Name of the dataset for experiment.')
+    parser.add_argument('--dataset', type=str, required=True, help='batch size for training.')
     parser.add_argument('--batch', type=int, required=True, help='batch size for training.')
 
 
     ar = parser.parse_args()
     print(ar.dataset)
 
-    dataset_dir = os.path.join(BASE_DIR, 'processed_dataset', ar.dataset)
+    dataset_dir = os.path.join(BASE_DIR, 'data', ar.dataset)
     output_dir = os.path.join(SAVED_DIR, ar.dataset, str(ar.batch))
 
     arg = Args()
@@ -540,5 +553,10 @@ if __name__ == "__main__":
     arg.eval_data_file = os.path.join(dataset_dir, 'valid.jsonl')
     arg.output_dir = output_dir
     arg.train_batch_size = ar.batch
+
+    if ar.dataset == 'func_jsonal':
+        arg.idx_key = 'id'
+    else:
+        arg.idx_key = 'idx'
 
     main(arg)
