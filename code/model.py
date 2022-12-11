@@ -10,7 +10,7 @@ from torch.nn import CrossEntropyLoss, MSELoss
     
     
 class Model(nn.Module):   
-    def __init__(self, encoder,config,tokenizer,args):
+    def __init__(self, encoder,config,tokenizer, args=None):
         super(Model, self).__init__()
         self.encoder = encoder
         self.config=config
@@ -20,8 +20,12 @@ class Model(nn.Module):
         self.criterion = nn.CrossEntropyLoss()
     
         
-    def forward(self, input_ids=None,labels=None, explain=False): 
-        outputs=self.encoder(input_ids, attention_mask=input_ids.ne(1))
+    def forward(self, input_ids=None, labels=None, inputs_embeds=None, explain=False): 
+        if inputs_embeds is not None:
+            outputs=self.encoder(inputs_embeds=inputs_embeds, attention_mask=input_ids.ne(1))
+        else:
+            outputs=self.encoder(input_ids, attention_mask=input_ids.ne(1))
+
         logits=outputs[0]
         prob=torch.softmax(logits, dim=-1)
         if labels is not None:
