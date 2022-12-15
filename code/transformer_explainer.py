@@ -54,12 +54,15 @@ class TransformerExplainer:
     def create_explanations(self, dataloader):
         result = []
         for id, batch in enumerate(dataloader):
-            input_ids, labels = batch
-            scores = self.explain(input_ids, labels).cpu().detach().numpy()
+            input_ids, labels, idx = batch
+            scores = self.explain(input_ids, labels).cpu().detach().numpy().tolist()
             tokens = [self.tokenizer.convert_ids_to_tokens(input_id) for input_id in input_ids]
             result.append({
                 'tokens': tokens,
                 'scores': scores,
+                'idx': idx[0],
+
             })
             print("Explanation done with  id: ", id)
+            # break
         return result

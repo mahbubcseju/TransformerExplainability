@@ -107,9 +107,7 @@ class TextDataset(Dataset):
         return len(self.examples)
 
     def __getitem__(self, i):
-        labels = np.zeros((2,))
-        labels[self.examples[i].label] = 1
-        return torch.tensor(self.examples[i].input_ids), torch.tensor(self.examples[i].label)
+        return torch.tensor(self.examples[i].input_ids), torch.tensor(self.examples[i].label), self.examples[i].idx
 
 
 class CodebertModel:
