@@ -61,5 +61,5 @@ class TransformerExplainer:
                 'tokens': tokens,
                 'scores': scores,
             })
-            print(result)
+            print("Explanation done with  id: ", id)
         return result

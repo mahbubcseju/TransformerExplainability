@@ -163,8 +163,8 @@ class CodebertModel:
                 logits.append(logit.cpu().numpy())
                 labels.append(label.cpu().numpy())
 
-        logits=np.concatenate(logits,0)
-        labels=np.concatenate(labels,0)
+        logits=np.concatenate(logits, 0)
+        labels=np.concatenate(labels, 0)
 
         acts = np.array([0 if (sample[0] > sample[1]) else 1 for sample in labels])
         preds = np.array([0 if (sample[0] > sample[1]) else 1 for sample in logits])
