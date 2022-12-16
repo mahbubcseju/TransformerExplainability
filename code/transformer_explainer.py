@@ -23,11 +23,13 @@ class TransformerExplainer:
         num_blocks = len(attention)
 
         states = attention[-1].mean(1)[:, 0, :].reshape(b, 1, s)
+        print(states.shape)
         for i in range(start_layer, num_blocks - 1)[::-1]:
             attn = attention[i].mean(1)
             states_ = states
             states = states.bmm(attn)
             states += states_
+            print(states.shape)
 
         total_gradients = torch.zeros(b, h, s, s).cpu()
         for alpha in np.linspace(0, 1, steps):        
@@ -60,9 +62,9 @@ class TransformerExplainer:
             result.append({
                 'tokens': tokens,
                 'scores': scores,
-                'idx': idx[0],
+                'id': idx[0],
 
             })
             print("Explanation done with  id: ", id)
-            # break
+            break
         return result
